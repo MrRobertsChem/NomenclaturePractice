@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Compound Naming Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Practice naming ionic compounds, molecular compounds and acids, and writing their formulas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: lab-bench app. Settings strip on top, a big periodic-tile question card beside a scoreboard, ion reference sheet below.
+   Topic colors follow flame-test colors: sodium amber, copper green, potassium lilac, lithium crimson, calcium brick. */
+:root {
+  --paper: #f3f6f7;
+  --surface: #ffffff;
+  --sunk: #e9eef0;
+  --ink: #142029;
+  --muted: #566672;
+  --line: #d3dde2;
+  --accent: #0c6874;
+  --accent-ink: #ffffff;
+  --good: #1d7f45;
+  --good-bg: #e3f4ea;
+  --bad: #b23a26;
+  --bad-bg: #fbe9e5;
+  --t-main: #c98a0b;
+  --t-tm: #2a8a62;
+  --t-poly: #8a5fb8;
+  --t-molec: #c5344f;
+  --t-acid: #c4581f;
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f161b; --surface: #172129; --sunk: #1d2932; --ink: #e6eef2; --muted: #9aabb6; --line: #2b3a45;
+    --accent: #4fb8c4; --accent-ink: #06272b; --good: #5fcf8c; --good-bg: #13301f; --bad: #f08a76; --bad-bg: #3a1a14;
+    --t-main: #f0b93a; --t-tm: #4fc48f; --t-poly: #b996e3; --t-molec: #f06a84; --t-acid: #f08a50;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f161b; --surface: #172129; --sunk: #1d2932; --ink: #e6eef2; --muted: #9aabb6; --line: #2b3a45;
+  --accent: #4fb8c4; --accent-ink: #06272b; --good: #5fcf8c; --good-bg: #13301f; --bad: #f08a76; --bad-bg: #3a1a14;
+  --t-main: #f0b93a; --t-tm: #4fc48f; --t-poly: #b996e3; --t-molec: #f06a84; --t-acid: #f08a50;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 24px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 20px; }
+sub { font-size: 0.68em; vertical-align: -0.28em; line-height: 0; }
+sup { font-size: 0.62em; vertical-align: 0.6em; line-height: 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Header */
+header { display: flex; align-items: center; gap: 16px; }
+.logo { flex: none; width: 64px; height: 64px; border: 2px solid var(--ink); border-radius: 6px; display: grid; grid-template-rows: auto 1fr auto; padding: 4px 6px; background: var(--surface); }
+.logo .z { font-size: 11px; font-weight: 700; line-height: 1; }
+.logo .s { font-family: var(--font-display); font-weight: 800; font-size: 26px; line-height: 1; align-self: center; }
+.logo .n { font-size: 8px; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1; color: var(--muted); }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(26px, 4vw, 34px); line-height: 1.1; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+header p { margin: 4px 0 0; color: var(--muted); max-width: 60ch; }
+
+/* Settings */
+.settings { display: flex; flex-wrap: wrap; gap: 14px 28px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.group { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.group > .label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-btn { display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px 5px 9px; font-size: 14px; }
+.chip-btn .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); opacity: 0.35; }
+.chip-btn[aria-pressed="true"] { border-color: var(--c); background: color-mix(in srgb, var(--c) 12%, var(--surface)); font-weight: 700; }
+.chip-btn[aria-pressed="true"] .dot { opacity: 1; }
+.seg { display: inline-flex; border: 1.5px solid var(--line); border-radius: 8px; overflow: hidden; flex-wrap: wrap; }
+.seg button { border: 0; background: transparent; padding: 6px 12px; font-size: 14px; }
+.seg button + button { border-left: 1.5px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); font-weight: 700; }
+
+/* Main grid */
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }
+@media (max-width: 820px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.qhead { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.qkind { font-family: var(--font-display); font-weight: 600; font-size: 18px; }
+.tag { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--c); border: 1.5px solid var(--c); border-radius: 999px; padding: 1px 10px; }
+.tag::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.qprog { margin-left: auto; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.prompt { position: relative; border: 2px solid var(--c, var(--ink)); border-radius: 8px; background: var(--sunk); min-height: 150px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 28px 16px; overflow-wrap: anywhere; }
+.prompt .big { font-size: clamp(34px, 7vw, 60px); font-weight: 700; line-height: 1.2; }
+.prompt .big.name { font-size: clamp(26px, 5vw, 40px); }
+.prompt .aq { font-size: 0.5em; font-weight: 400; color: var(--muted); margin-left: 2px; }
+.prompt .corner { position: absolute; top: 8px; left: 10px; font-size: 12px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.answer { display: flex; gap: 8px; flex-wrap: wrap; }
+.answer input { flex: 1 1 220px; min-width: 0; font: inherit; font-size: 20px; padding: 10px 14px; border: 2px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
+.answer input:focus { border-color: var(--accent); outline: none; }
+.answer input[readonly] { background: var(--sunk); }
+.primary { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 8px; padding: 10px 22px; font-weight: 700; font-size: 17px; }
+.preview { min-height: 24px; font-size: 18px; color: var(--muted); margin-top: -8px; }
+.preview b { color: var(--ink); }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; }
+.ghost { background: transparent; border: 1.5px solid var(--line); border-radius: 8px; padding: 6px 12px; font-size: 14px; }
+.ghost:hover { border-color: var(--muted); }
+.hint { border-left: 4px solid var(--accent); background: var(--sunk); padding: 10px 14px; border-radius: 0 8px 8px 0; }
+.feedback { border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.feedback.ok { background: var(--good-bg); }
+.feedback.no { background: var(--bad-bg); }
+.feedback .verdict { font-family: var(--font-display); font-weight: 800; font-size: 20px; }
+.feedback.ok .verdict { color: var(--good); }
+.feedback.no .verdict { color: var(--bad); }
+.feedback .ans { font-size: 19px; }
+.feedback .note { font-weight: 700; }
+.feedback p { margin: 0; }
+.keys { font-size: 13px; color: var(--muted); }
+kbd { font: inherit; font-size: 12px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; background: var(--surface); }
+
+/* Scoreboard */
+.board { display: flex; flex-direction: column; gap: 16px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.panel h2 { font-family: var(--font-display); font-weight: 600; font-size: 16px; margin: 0; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { display: flex; flex-direction: column; }
+.stat .v { font-family: var(--font-display); font-weight: 800; font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.bars { display: flex; flex-direction: column; gap: 8px; }
+.bar-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; font-size: 14px; }
+.bar-row .n { font-variant-numeric: tabular-nums; color: var(--muted); }
+.bar { grid-column: 1 / -1; height: 6px; background: var(--sunk); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--c); border-radius: 3px; transition: width 0.3s; }
+.history { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.history li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 6px; }
+.history .m { font-weight: 700; }
+.history .m.ok { color: var(--good); }
+.history .m.no { color: var(--bad); }
+.history .q { overflow-wrap: anywhere; }
+.history .q span { color: var(--muted); }
+.empty { color: var(--muted); font-size: 14px; margin: 0; }
+.linkish { background: none; border: 0; padding: 0; color: var(--muted); text-decoration: underline; font-size: 13px; align-self: flex-start; }
+
+/* Rank */
+.rank-top { display: flex; align-items: center; gap: 12px; }
+.rank-badge { flex: none; width: 46px; height: 46px; border: 2px solid var(--accent); border-radius: 6px; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 20px; color: var(--accent); font-variant-numeric: tabular-nums; }
+.rank-name { font-family: var(--font-display); font-weight: 800; font-size: 20px; line-height: 1.15; }
+.rank-sub { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.xpbar { height: 10px; background: var(--sunk); border-radius: 5px; overflow: hidden; }
+.xpbar i { display: block; height: 100%; background: var(--accent); border-radius: 5px; transition: width 0.4s; }
+.xp-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.xp-gain { font-weight: 700; color: var(--accent); }
+.rankup { font-family: var(--font-display); font-weight: 800; font-size: 18px; color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .xpbar i { transition: none; } }
+
+/* Quiz summary */
+.summary .score { font-family: var(--font-display); font-weight: 800; font-size: clamp(40px, 8vw, 64px); line-height: 1; font-variant-numeric: tabular-nums; }
+.summary .meta { color: var(--muted); }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; }
+td.ok { color: var(--good); font-weight: 700; }
+td.no { color: var(--bad); font-weight: 700; }
+
+/* Reference */
+details.ref { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+details.ref > summary { cursor: pointer; padding: 14px 16px; font-family: var(--font-display); font-weight: 600; font-size: 17px; }
+.ref-body { padding: 0 16px 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.ref-body h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin: 0 0 6px; }
+.ref-body table { font-size: 14px; }
+.ref-body td, .ref-body th { padding: 4px 6px; }
+.ref-body p { margin: 0 0 6px; font-size: 14px; }
+footer { color: var(--muted); font-size: 13px; }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="logo" aria-hidden="true"><span class="z">IUPAC</span><span class="s">Nm</span><span class="n">Naming</span></div>
+    <div>
+      <h1>Compound Naming Lab</h1>
+      <p>Practice Type I, Type II and Type III compounds, plus polyatomic ions and acids when you turn them on. Name compounds from their formulas and write formulas from their names. Check each answer and read why it's right.</p>
+    </div>
+  </header>
+
+  <section class="settings" aria-label="Practice settings">
+    <div class="group">
+      <span class="label" id="lbl-topics">Topics</span>
+      <div class="chips" id="topics" role="group" aria-labelledby="lbl-topics"></div>
+    </div>
+    <div class="group">
+      <span class="label" id="lbl-dir">Practice</span>
+      <div class="seg" id="dir" role="group" aria-labelledby="lbl-dir">
+        <button id="dir-both" data-v="both" aria-pressed="true">Both ways</button>
+        <button id="dir-f2n" data-v="f2n" aria-pressed="false">Formula → name</button>
+        <button id="dir-n2f" data-v="n2f" aria-pressed="false">Name → formula</button>
+      </div>
+    </div>
+    <div class="group">
+      <span class="label" id="lbl-len">Session</span>
+      <div class="seg" id="len" role="group" aria-labelledby="lbl-len">
+        <button id="len-0" data-v="0" aria-pressed="true">Endless</button>
+        <button id="len-10" data-v="10" aria-pressed="false">Quiz of 10</button>
+        <button id="len-20" data-v="20" aria-pressed="false">Quiz of 20</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <main class="card" id="qcard">
+      <div class="qhead">
+        <span class="qkind" id="qkind">Name this compound</span>
+        <span class="tag" id="qtag"></span>
+        <span class="qprog" id="qprog"></span>
+      </div>
+      <div class="prompt" id="prompt" aria-live="polite"></div>
+      <div class="answer" id="form">
+        <label for="answer" class="sr" id="answer-label">Your answer</label>
+        <input id="answer" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <button class="primary" id="go" type="button">Check</button>
+      </div>
+      <div class="preview" id="preview" aria-hidden="true"></div>
+      <div class="tools">
+        <button class="ghost" id="hintBtn" type="button">Hint</button>
+        <button class="ghost" id="revealBtn" type="button">Show answer</button>
+        <button class="ghost" id="skipBtn" type="button">Skip</button>
+      </div>
+      <div class="hint" id="hint" hidden></div>
+      <div class="feedback" id="feedback" hidden aria-live="polite"></div>
+      <div class="keys"><kbd>Enter</kbd> checks your answer, then <kbd>Enter</kbd> again for the next one.</div>
+    </main>
+
+    <section class="card summary" id="summary" hidden aria-live="polite"></section>
+
+    <aside class="board">
+      <div class="panel" id="rankPanel" aria-live="polite">
+        <div class="rank-top">
+          <div class="rank-badge" id="r-level">1</div>
+          <div><div class="rank-name" id="r-name">Lab Novice</div><div class="rank-sub" id="r-sub">Rank 1 of 8</div></div>
+        </div>
+        <div class="xpbar" role="progressbar" aria-label="XP toward next rank" aria-valuemin="0" aria-valuemax="100" id="r-bar"><i id="r-fill" style="width:0%"></i></div>
+        <div class="xp-meta"><span id="r-xp">0 XP</span><span id="r-next">100 XP to Lab Assistant</span></div>
+        <button class="linkish" id="rankResetBtn" type="button">Reset rank</button>
+      </div>
+      <div class="panel">
+        <h2>Score</h2>
+        <div class="stats">
+          <div class="stat"><span class="v" id="s-score">0/0</span><span class="k">Correct</span></div>
+          <div class="stat"><span class="v" id="s-streak">0</span><span class="k">Streak</span></div>
+          <div class="stat"><span class="v" id="s-best">0</span><span class="k">Best</span></div>
+        </div>
+        <div class="bars" id="bars"></div>
+        <button class="linkish" id="resetBtn" type="button">Reset score</button>
+      </div>
+      <div class="panel">
+        <h2>Recent answers</h2>
+        <ul class="history" id="history"></ul>
+      </div>
+    </aside>
+  </div>
+
+  <details class="ref" id="ref">
+    <summary>Ion, prefix and acid reference</summary>
+    <div class="ref-body" id="refBody"></div>
+  </details>
+
+  <footer>Formulas: type numbers as plain digits, like Fe2O3. They show as subscripts while you type. Capital letters matter: Co is cobalt, CO is carbon monoxide.</footer>
+</div>
+
+<script>
+// ===================== Chemistry data and logic =====================
+const MINUS = "−";
+const ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII"];
+const PREFIX = ["", "mono", "di", "tri", "tetra", "penta", "hexa", "hepta", "octa", "nona", "deca"];
+
+const TOPICS = [
+  { id: "main", label: "Type I: one-charge metals", short: "Type I ionic", color: "--t-main" },
+  { id: "tm", label: "Type II: variable-charge metals", short: "Type II ionic", color: "--t-tm" },
+  { id: "molec", label: "Type III: molecular", short: "Type III molecular", color: "--t-molec" },
+  { id: "poly", label: "Polyatomic ions", short: "Polyatomic ions", color: "--t-poly", extra: true },
+  { id: "acid", label: "Acids", short: "Acids", color: "--t-acid", extra: true },
+];
+
+// Metals with one common charge
+const FIXED = [
+  { f: "Li", name: "lithium", q: 1 }, { f: "Na", name: "sodium", q: 1 }, { f: "K", name: "potassium", q: 1 },
+  { f: "Mg", name: "magnesium", q: 2 }, { f: "Ca", name: "calcium", q: 2 }, { f: "Sr", name: "strontium", q: 2 },
+  { f: "Ba", name: "barium", q: 2 }, { f: "Al", name: "aluminum", q: 3 }, { f: "Zn", name: "zinc", q: 2 },
+  { f: "Ag", name: "silver", q: 1 },
+];
+const AMMONIUM = { f: "NH4", name: "ammonium", q: 1, poly: true };
+// Metals with more than one common charge
+const VARIABLE = [
+  { f: "Fe", name: "iron", qs: [2, 3] }, { f: "Cu", name: "copper", qs: [1, 2] }, { f: "Co", name: "cobalt", qs: [2, 3] },
+  { f: "Cr", name: "chromium", qs: [2, 3] }, { f: "Mn", name: "manganese", qs: [2, 4] }, { f: "Sn", name: "tin", qs: [2, 4] },
+  { f: "Pb", name: "lead", qs: [2, 4] }, { f: "Ni", name: "nickel", qs: [2, 3] }, { f: "Au", name: "gold", qs: [1, 3] },
+];
+const MONO = [
+  { f: "F", name: "fluoride", q: -1 }, { f: "Cl", name: "chloride", q: -1 }, { f: "Br", name: "bromide", q: -1 },
+  { f: "I", name: "iodide", q: -1 }, { f: "O", name: "oxide", q: -2 }, { f: "S", name: "sulfide", q: -2 },
+  { f: "N", name: "nitride", q: -3 }, { f: "P", name: "phosphide", q: -3 },
+];
+const POLY = [
+  { f: "OH", name: "hydroxide", q: -1 }, { f: "NO3", name: "nitrate", q: -1 }, { f: "NO2", name: "nitrite", q: -1 },
+  { f: "SO4", name: "sulfate", q: -2 }, { f: "SO3", name: "sulfite", q: -2 }, { f: "PO4", name: "phosphate", q: -3 },
+  { f: "CO3", name: "carbonate", q: -2 }, { f: "HCO3", name: "hydrogen carbonate", alt: ["bicarbonate"], q: -1 },
+  { f: "C2H3O2", name: "acetate", altF: ["CH3COO"], q: -1 }, { f: "ClO4", name: "perchlorate", q: -1 },
+  { f: "ClO3", name: "chlorate", q: -1 }, { f: "ClO2", name: "chlorite", q: -1 }, { f: "ClO", name: "hypochlorite", q: -1 },
+  { f: "CN", name: "cyanide", q: -1 }, { f: "MnO4", name: "permanganate", q: -1 }, { f: "CrO4", name: "chromate", q: -2 },
+  { f: "Cr2O7", name: "dichromate", q: -2 }, { f: "HSO4", name: "hydrogen sulfate", alt: ["bisulfate"], q: -1 },
+  { f: "HPO4", name: "hydrogen phosphate", q: -2 }, { f: "H2PO4", name: "dihydrogen phosphate", q: -1 },
+].map(a => ({ ...a, poly: true }));
+
+const NONMETAL = {
+  B: ["boron", "boride"], C: ["carbon", "carbide"], N: ["nitrogen", "nitride"], O: ["oxygen", "oxide"],
+  F: ["fluorine", "fluoride"], Si: ["silicon", "silicide"], P: ["phosphorus", "phosphide"], S: ["sulfur", "sulfide"],
+  Cl: ["chlorine", "chloride"], Se: ["selenium", "selenide"], Br: ["bromine", "bromide"], I: ["iodine", "iodide"],
+  Xe: ["xenon", "xenide"],
+};
+const MOLEC = [
+  ["C", 1, "O", 1], ["C", 1, "O", 2], ["N", 1, "O", 1], ["N", 1, "O", 2], ["N", 2, "O", 1], ["N", 2, "O", 3],
+  ["N", 2, "O", 4], ["N", 2, "O", 5], ["S", 1, "O", 2], ["S", 1, "O", 3], ["P", 1, "Cl", 3], ["P", 1, "Cl", 5],
+  ["P", 4, "O", 10], ["P", 4, "O", 6], ["C", 1, "Cl", 4], ["S", 1, "F", 6], ["Si", 1, "O", 2], ["C", 1, "S", 2],
+  ["Si", 1, "Cl", 4], ["B", 1, "F", 3], ["Cl", 1, "F", 3], ["I", 1, "F", 7], ["O", 1, "F", 2], ["Cl", 2, "O", 7],
+  ["Xe", 1, "F", 4], ["Xe", 1, "F", 6], ["Se", 1, "O", 2], ["S", 2, "Cl", 2], ["N", 1, "Cl", 3], ["N", 1, "F", 3],
+  ["P", 2, "S", 5], ["S", 1, "Cl", 2], ["I", 1, "Cl", 3], ["C", 1, "Br", 4], ["Si", 1, "F", 4], ["Br", 1, "Cl", 1],
+  ["P", 1, "Br", 3], ["Cl", 1, "O", 2], ["B", 1, "Cl", 3], ["S", 1, "F", 4],
+];
+// [formula, name, parent anion name, anion formula, charge, rule, extra note]
+const ACIDS = [
+  ["HF", "hydrofluoric acid", "fluoride", "F", 1, "binary"],
+  ["HCl", "hydrochloric acid", "chloride", "Cl", 1, "binary"],
+  ["HBr", "hydrobromic acid", "bromide", "Br", 1, "binary"],
+  ["HI", "hydroiodic acid", "iodide", "I", 1, "binary"],
+  ["H2S", "hydrosulfuric acid", "sulfide", "S", 2, "binary", "Sulfur acids keep the \"ur\": hydrosulfuric, sulfuric, sulfurous."],
+  ["HCN", "hydrocyanic acid", "cyanide", "CN", 1, "binary"],
+  ["HNO3", "nitric acid", "nitrate", "NO3", 1, "ate"],
+  ["HNO2", "nitrous acid", "nitrite", "NO2", 1, "ite"],
+  ["H2SO4", "sulfuric acid", "sulfate", "SO4", 2, "ate", "Sulfur acids keep the \"ur\": sulfuric, not sulfic."],
+  ["H2SO3", "sulfurous acid", "sulfite", "SO3", 2, "ite", "Sulfur acids keep the \"ur\": sulfurous, not sulfous."],
+  ["H3PO4", "phosphoric acid", "phosphate", "PO4", 3, "ate", "Phosphorus acids keep the \"or\": phosphoric."],
+  ["H3PO3", "phosphorous acid", "phosphite", "PO3", 3, "ite", "Phosphorus acids keep the \"or\": phosphorous."],
+  ["H2CO3", "carbonic acid", "carbonate", "CO3", 2, "ate"],
+  ["HC2H3O2", "acetic acid", "acetate", "C2H3O2", 1, "ate"],
+  ["HClO4", "perchloric acid", "perchlorate", "ClO4", 1, "ate"],
+  ["HClO3", "chloric acid", "chlorate", "ClO3", 1, "ate"],
+  ["HClO2", "chlorous acid", "chlorite", "ClO2", 1, "ite"],
+  ["HClO", "hypochlorous acid", "hypochlorite", "ClO", 1, "ite"],
+  ["HBrO3", "bromic acid", "bromate", "BrO3", 1, "ate"],
+  ["H2CrO4", "chromic acid", "chromate", "CrO4", 2, "ate"],
+  ["HMnO4", "permanganic acid", "permanganate", "MnO4", 1, "ate"],
+];
+const ACID_ALT_NAMES = { HI: ["hydriodic acid"] };
+const ACID_ALT_F = { HC2H3O2: ["CH3COOH", "HCH3COO"] };
+
+function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+function fsub(f) { return esc(f).replace(/(\d+)/g, "<sub>$1</sub>"); }
+function chargeSup(q) { const n = Math.abs(q); return "<sup>" + (n === 1 ? "" : n) + (q > 0 ? "+" : MINUS) + "</sup>"; }
+function ion(f, q) { return "<b>" + fsub(f) + chargeSup(q) + "</b>"; }
+function signed(n) { return (n > 0 ? "+" : MINUS) + Math.abs(n); }
+
+function ionicQ(topic, cat, q, an) {
+  const aq = Math.abs(an.q), g = gcd(q, aq), nc = aq / g, na = q / g;
+  const part = (f, poly, n) => n === 1 ? f : poly ? "(" + f + ")" + n : f + n;
+  const formulas = [an.f, ...(an.altF || [])].map(af => part(cat.f, cat.poly, nc) + part(af, an.poly, na));
+  const formula = formulas[0];
+  const variable = !!cat.qs;
+  const cName = variable ? cat.name + "(" + ROMAN[q] + ")" : cat.name;
+  const names = [an.name, ...(an.alt || [])].map(n => cName + " " + n);
+  const name = names[0];
+  const cIon = ion(cat.f, q), aIon = ion(an.f, an.q);
+
+  const catDesc = variable ? cap(cName) + " means " + cat.name + " with a +" + q + " charge: " + cIon + "."
+    : cat.poly ? "Ammonium is the polyatomic ion " + cIon + "."
+    : cap(cat.name) + " always forms " + cIon + ".";
+  const anDesc = cap(an.name) + " is " + aIon + ".";
+  const parens = (cat.poly && nc > 1) || (an.poly && na > 1)
+    ? " Parentheses keep a polyatomic ion together when you need more than one of it." : "";
+  const balance = nc === 1 && na === 1
+    ? "The charges " + signed(q) + " and " + signed(an.q) + " already cancel, so you need one of each: <b>" + fsub(formula) + "</b>."
+    : nc + " × (" + signed(q) + ") = " + signed(nc * q) + " and " + na + " × (" + signed(an.q) + ") = " + signed(na * an.q) + ", so the formula is <b>" + fsub(formula) + "</b>.";
+
+  let f2n;
+  if (variable) {
+    f2n = "The anion is " + an.name + " (" + aIon + "). " + na + " of them carry " + signed(na * an.q) + " in total, shared by " + nc + " " + cat.name + " ion" + (nc > 1 ? "s" : "") + ", so each " + cat.name + " is +" + q + ". " +
+      cap(cat.name) + " can have more than one charge, so write it as a Roman numeral: <b>" + esc(name) + "</b>.";
+  } else {
+    f2n = (cat.poly ? "NH<sub>4</sub><sup>+</sup> is ammonium" : cap(cat.name) + " only forms " + cIon) + ", so no Roman numeral is needed. " +
+      (an.poly ? "The anion " + aIon + " is the polyatomic ion " + an.name + ". " : "A single-element anion takes an -ide ending. ") +
+      "Name the cation, then the anion: <b>" + esc(name) + "</b>.";
+  }
+  return {
+    topic, key: topic + ":" + formula, formula, formulas, name, names, variable,
+    promptF: fsub(formula),
+    n2fExplain: catDesc + " " + anDesc + " " + balance + parens,
+    f2nExplain: f2n,
+    n2fHint: cap(cName) + " is " + cIon + " and " + an.name + " is " + aIon + ". Combine them so the charges add up to zero.",
+    f2nHint: variable
+      ? cap(cat.name) + " is a transition metal with more than one possible charge. Use the anion's charge to work out the metal's charge, then write it as a Roman numeral."
+      : (cat.poly ? "NH<sub>4</sub> is the ammonium ion." : cap(cat.name) + " has only one common charge, so it needs no Roman numeral.") + " " +
+        (an.poly ? "Look up the polyatomic ion " + fsub(an.f) + "." : "A single-element anion ends in -ide."),
+  };
+}
+
+function molecQ(e1, n1, e2, n2) {
+  const formula = e1 + (n1 > 1 ? n1 : "") + e2 + (n2 > 1 ? n2 : "");
+  const first = (n1 > 1 ? PREFIX[n1] : "") + NONMETAL[e1][0];
+  const root = NONMETAL[e2][1], p = PREFIX[n2];
+  const elided = /[ao]$/.test(p) && root[0] === "o" ? p.slice(0, -1) + root : p + root;
+  const name = first + " " + elided;
+  const names = [name];
+  if (elided !== p + root) names.push(first + " " + p + root);
+  const firstWhy = n1 > 1 ? n1 + " " + NONMETAL[e1][0] + " atoms → " + PREFIX[n1] + "-" : "1 " + NONMETAL[e1][0] + " atom → no prefix (mono- is dropped on the first element)";
+  const secondWhy = n2 + " " + NONMETAL[e2][0] + " atom" + (n2 > 1 ? "s" : "") + " → " + p + "-";
+  return {
+    topic: "molec", key: "molec:" + formula, formula, formulas: [formula], name, names,
+    promptF: fsub(formula),
+    n2fExplain: "Both elements are nonmetals, so the prefixes give the number of each atom directly: " + firstWhy + ", " + secondWhy + ". Molecular compounds have no ion charges to balance, so the formula is <b>" + fsub(formula) + "</b>.",
+    f2nExplain: "Both elements are nonmetals, so use Greek prefixes for the counts: " + firstWhy + "; " + secondWhy + ". The second element takes an -ide ending" +
+      (elided !== p + root ? ", and the a or o at the end of the prefix is dropped before \"oxide\"" : "") + ": <b>" + esc(name) + "</b>.",
+    n2fHint: "Read each prefix as a number: mono 1, di 2, tri 3, tetra 4, penta 5, hexa 6, hepta 7, octa 8, nona 9, deca 10. No charges are involved.",
+    f2nHint: "Two nonmetals make a molecular compound. Use prefixes for every atom count, but leave mono- off the first element.",
+  };
+}
+
+function acidQ(row) {
+  const [formula, name, from, af, aq, rule, note] = row;
+  const ruleText = rule === "binary" ? "The anion ends in -ide, so the acid is hydro- + root + -ic acid"
+    : rule === "ate" ? "The anion ends in -ate, so the acid ends in -ic acid"
+    : "The anion ends in -ite, so the acid ends in -ous acid";
+  return {
+    topic: "acid", key: "acid:" + formula, formula, formulas: [formula, ...(ACID_ALT_F[formula] || [])],
+    name, names: [name, ...(ACID_ALT_NAMES[formula] || [])], acid: true,
+    promptF: fsub(formula) + '<span class="aq">(aq)</span>',
+    n2fExplain: cap(name) + " comes from the " + from + " ion, " + ion(af, -aq) + ". Add " + aq + " H<sup>+</sup> ion" + (aq > 1 ? "s" : "") + " to cancel its " + signed(-aq) + " charge: <b>" + fsub(formula) + "</b>." + (note ? " " + esc(note) : ""),
+    f2nExplain: "Take the H off and the anion is " + ion(af, -aq) + ", " + from + ". " + ruleText + ": <b>" + esc(name) + "</b>." + (note ? " " + esc(note) : ""),
+    n2fHint: "Find the parent anion: -ic acid comes from -ate (or from -ide if it starts with hydro-), and -ous acid comes from -ite. Then add one H for each negative charge.",
+    f2nHint: "Remove the hydrogens to find the anion. -ide becomes hydro-…-ic acid, -ate becomes -ic acid, -ite becomes -ous acid.",
+  };
+}
+
+function generate(topic) {
+  if (topic === "main") { const c = pick(FIXED); return ionicQ("main", c, c.q, pick(MONO)); }
+  if (topic === "tm") { const m = pick(VARIABLE); return ionicQ("tm", m, pick(m.qs), pick(MONO)); }
+  if (topic === "poly") {
+    const roll = Math.random();
+    if (roll < 0.2) return ionicQ("poly", AMMONIUM, 1, pick(POLY));
+    if (roll < 0.5) { const m = pick(VARIABLE); return ionicQ("poly", m, pick(m.qs), pick(POLY)); }
+    const c = pick(FIXED); return ionicQ("poly", c, c.q, pick(POLY));
+  }
+  if (topic === "acid") return acidQ(pick(ACIDS));
+  return molecQ(...pick(MOLEC));
+}
+
+// ---------- Answer checking ----------
+function normName(s) {
+  return s.toLowerCase()
+    .replace(/sulph/g, "sulf").replace(/aluminium/g, "aluminum")
+    .replace(/[‐-―-]/g, "")
+    .replace(/\s*\(\s*/g, "(").replace(/\s*\)\s*/g, ") ")
+    .replace(/\s+/g, " ").replace(/[.]+$/, "").trim();
+}
+function normFormula(s) {
+  return s.replace(/[₀-₉]/g, c => String(c.charCodeAt(0) - 0x2080))
+    .replace(/\s+/g, "").replace(/\[/g, "(").replace(/\]/g, ")")
+    .replace(/\((aq|s|l|g)\)$/i, "");
+}
+function atomCounts(f) {
+  const st = [new Map()]; let i = 0;
+  const add = (m, k, v) => m.set(k, (m.get(k) || 0) + v);
+  while (i < f.length) {
+    const c = f[i];
+    if (c === "(") { st.push(new Map()); i++; }
+    else if (c === ")") {
+      i++; const m = f.slice(i).match(/^\d+/); const n = m ? +m[0] : 1; if (m) i += m[0].length;
+      const top = st.pop(); if (!st.length) return null;
+      for (const [k, v] of top) add(st[st.length - 1], k, v * n);
+    } else {
+      const m = f.slice(i).match(/^([A-Z][a-z]?)(\d*)/); if (!m) return null;
+      i += m[0].length; add(st[st.length - 1], m[1], m[2] ? +m[2] : 1);
+    }
+  }
+  if (st.length !== 1) return null;
+  return [...st[0]].sort().map(([k, v]) => k + v).join("");
+}
+
+// Returns { ok, note }
+function checkAnswer(q, mode, raw) {
+  const input = raw.trim();
+  if (mode === "n2f") {
+    const n = normFormula(input);
+    if (q.formulas.includes(n)) return { ok: true };
+    const noParens = n.replace(/\(([A-Za-z0-9]+)\)(?!\d)/g, "$1");
+    if (noParens !== n && q.formulas.includes(noParens)) return { ok: true, note: "Parentheses are only needed when there is more than one of a polyatomic ion." };
+    if (q.formulas.some(f => f.toLowerCase() === n.toLowerCase())) return { ok: false, note: "Check your capital letters. Each element symbol starts with a capital, and a second letter is lowercase (Co is cobalt, CO is carbon monoxide)." };
+    const target = atomCounts(q.formula), mine = atomCounts(n);
+    if (mine && target === mine) return { ok: false, note: "You have the right atoms, but write each ion as a unit: cation first, then the anion, with parentheses around a repeated polyatomic ion." };
+    if (/[a-z]/.test(n) && !/[A-Z]/.test(n)) return { ok: false, note: "This one wants a formula, like Fe2O3, not a name." };
+    return { ok: false };
+  }
+  const n = normName(input);
+  const accepted = q.names.map(normName);
+  if (accepted[0] === n) return { ok: true };
+  if (accepted.includes(n)) return { ok: true, note: "Also correct. The preferred form is " + q.name + "." };
+  if (q.variable && !n.includes("(")) return { ok: false, note: "This metal can have more than one charge, so the name needs a Roman numeral, like iron(III)." };
+  if (!q.variable && (q.topic === "main" || q.topic === "poly") && /\((i|ii|iii|iv|v|vi|vii)\)/.test(n)) return { ok: false, note: "This metal has only one common charge, so leave out the Roman numeral." };
+  if (q.topic === "molec" && /^mono/.test(n)) return { ok: false, note: "Leave mono- off the first element. CO is carbon monoxide, not monocarbon monoxide." };
+  if (q.topic === "molec" && !/(mono|di|tri|tetra|penta|hexa|hepta|octa|nona|deca)/.test(n)) return { ok: false, note: "Molecular compounds use prefixes to show how many of each atom." };
+  if (q.acid && !/acid$/.test(n)) return { ok: false, note: "Acid names end with the word acid." };
+  if (/\d/.test(n) && /[A-Z]/.test(input)) return { ok: false, note: "This one wants a name, not a formula." };
+  return { ok: false };
+}
+
+// ---------- Ranks ----------
+const RANKS = [
+  [0, "Lab Novice"], [100, "Lab Assistant"], [250, "Bench Chemist"], [500, "Ion Wrangler"],
+  [850, "Formula Smith"], [1300, "Bond Architect"], [1900, "Senior Chemist"], [2700, "Nomenclature Master"],
+];
+// Harder topics earn more. A hint halves the XP; a shown answer earns none.
+const XP_BY_TOPIC = { main: 10, molec: 10, tm: 15, poly: 15, acid: 15 };
+function xpFor(topic, hintUsed) { const base = XP_BY_TOPIC[topic] || 10; return hintUsed ? Math.round(base / 2) : base; }
+function rankOf(xp) {
+  let i = 0; while (i + 1 < RANKS.length && xp >= RANKS[i + 1][0]) i++;
+  const next = RANKS[i + 1];
+  return { index: i, name: RANKS[i][1], next: next ? next[1] : null, toNext: next ? next[0] - xp : 0,
+    pct: next ? Math.round(100 * (xp - RANKS[i][0]) / (next[0] - RANKS[i][0])) : 100 };
+}
+
+// ===================== UI =====================
+const $ = id => document.getElementById(id);
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("cnl:" + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("cnl:" + k, JSON.stringify(v)); } catch (e) {} },
+};
+const S = {
+  topics: new Set(store.get("topics", TOPICS.filter(t => !t.extra).map(t => t.id)).filter(id => TOPICS.some(t => t.id === id))),
+  dir: store.get("dir", "both"),
+  len: store.get("len", 0),
+  q: null, mode: "f2n", answered: false, hintUsed: false,
+  total: 0, correct: 0, streak: 0, best: store.get("best", 0), xp: Math.max(0, +store.get("xp", 0) || 0),
+  per: Object.fromEntries(TOPICS.map(t => [t.id, { n: 0, ok: 0 }])),
+  history: [], recentKeys: [], quiz: [],
+};
+
+// Optional link presets, e.g. #type2 or #type3.quiz10 or #ionic.toformulas
+(function readHash() {
+  const h = (location.hash || "").slice(1).toLowerCase();
+  if (!h) return;
+  const map = { type1: ["main"], typei: ["main"], type2: ["tm"], typeii: ["tm"], type3: ["molec"], typeiii: ["molec"],
+    molecular: ["molec"], ionic: ["main", "tm"], polyatomic: ["poly"], poly: ["poly"], acids: ["acid"], acid: ["acid"],
+    all: TOPICS.map(t => t.id) };
+  const topics = new Set();
+  for (const tok of h.split(/[._~]/)) {
+    if (map[tok]) map[tok].forEach(t => topics.add(t));
+    else if (tok === "tonames") S.dir = "f2n";
+    else if (tok === "toformulas") S.dir = "n2f";
+    else if (tok === "bothways") S.dir = "both";
+    else if (tok === "quiz10") S.len = 10;
+    else if (tok === "quiz20") S.len = 20;
+    else if (tok === "endless") S.len = 0;
+  }
+  if (topics.size) S.topics = topics;
+})();
+if (!S.topics.size) S.topics = new Set(TOPICS.filter(t => !t.extra).map(t => t.id));
+
+const topicById = Object.fromEntries(TOPICS.map(t => [t.id, t]));
+
+function buildSettings() {
+  $("topics").innerHTML = TOPICS.map(t =>
+    `<button type="button" class="chip-btn" id="topic-${t.id}" data-id="${t.id}" style="--c: var(${t.color})" aria-pressed="${S.topics.has(t.id)}"><span class="dot"></span>${t.label}</button>`).join("");
+  $("topics").onclick = e => {
+    const b = e.target.closest("button"); if (!b) return;
+    const id = b.dataset.id;
+    if (S.topics.has(id)) { if (S.topics.size === 1) return; S.topics.delete(id); } else S.topics.add(id);
+    b.setAttribute("aria-pressed", S.topics.has(id));
+    store.set("topics", [...S.topics]);
+    buildReference();
+    restart();
+  };
+  segment("dir", () => S.dir, v => { S.dir = v; store.set("dir", v); });
+  segment("len", () => String(S.len), v => { S.len = +v; store.set("len", +v); });
+}
+function segment(id, get, set) {
+  const el = $(id);
+  const sync = () => el.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === get()));
+  sync();
+  el.onclick = e => { const b = e.target.closest("button"); if (!b) return; set(b.dataset.v); sync(); restart(); };
+}
+
+function restart() {
+  S.quiz = [];
+  $("summary").hidden = true; $("qcard").hidden = false;
+  next();
+}
+
+function next() {
+  if (S.len && S.quiz.length >= S.len) return showSummary();
+  const topics = [...S.topics];
+  let q;
+  for (let tries = 0; tries < 25; tries++) {
+    q = generate(pick(topics));
+    if (!S.recentKeys.includes(q.key)) break;
+  }
+  S.recentKeys = [q.key, ...S.recentKeys].slice(0, 12);
+  S.q = q;
+  S.mode = S.dir === "both" ? (Math.random() < 0.5 ? "f2n" : "n2f") : S.dir;
+  S.answered = false; S.hintUsed = false;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = S.q, t = topicById[q.topic], f2n = S.mode === "f2n";
+  $("qcard").style.setProperty("--c", `var(${t.color})`);
+  $("qkind").textContent = f2n ? "Name this compound" : "Write the formula";
+  $("qtag").textContent = t.short;
+  $("qtag").style.setProperty("--c", `var(${t.color})`);
+  $("qprog").textContent = S.len ? `Question ${S.quiz.length + 1} of ${S.len}` : "";
+  $("prompt").style.setProperty("--c", `var(${t.color})`);
+  $("prompt").innerHTML = f2n ? `<span class="big">${q.promptF}</span>` : `<span class="big name">${esc(q.name)}</span>`;
+  const inp = $("answer");
+  inp.value = ""; inp.readOnly = false;
+  inp.placeholder = f2n ? (q.acid ? "e.g. hydrochloric acid" : "e.g. iron(III) chloride") : "e.g. Fe2O3";
+  $("answer-label").textContent = f2n ? "Type the name" : "Type the formula";
+  $("preview").innerHTML = "";
+  $("go").textContent = "Check";
+  $("hint").hidden = true; $("feedback").hidden = true;
+  $("hintBtn").disabled = $("revealBtn").disabled = $("skipBtn").disabled = false;
+  try { inp.focus({ preventScroll: true }); } catch (e) {}
+}
+
+function answerHTML(q, mode) { return mode === "n2f" ? fsub(q.formula) : esc(q.name); }
+
+function grade(ok, given, note, revealed) {
+  const q = S.q, mode = S.mode;
+  S.answered = true;
+  S.total++; S.per[q.topic].n++;
+  let gained = 0, rankedUp = null;
+  if (ok) {
+    S.correct++; S.per[q.topic].ok++; S.streak++; if (S.streak > S.best) { S.best = S.streak; store.set("best", S.best); }
+    const before = rankOf(S.xp).index;
+    gained = xpFor(q.topic, S.hintUsed); S.xp += gained; store.set("xp", S.xp);
+    const after = rankOf(S.xp);
+    if (after.index > before) rankedUp = after.name;
+  }
+  else S.streak = 0;
+  const prompt = mode === "f2n" ? q.promptF : esc(q.name);
+  S.history.unshift({ ok, prompt, answer: answerHTML(q, mode) });
+  S.history = S.history.slice(0, 6);
+  if (S.len) S.quiz.push({ ok, prompt, answer: answerHTML(q, mode), given: given == null ? "" : given, mode, topic: q.topic, hint: S.hintUsed });
+
+  const fb = $("feedback");
+  fb.className = "feedback " + (ok ? "ok" : "no");
+  const verdict = ok ? (S.hintUsed ? "Correct, with a hint" : "Correct") : revealed ? "Here's the answer" : "Not quite";
+  fb.innerHTML = (rankedUp ? `<div class="rankup">Rank up! You're now a ${esc(rankedUp)}.</div>` : "") +
+    `<div class="verdict">${verdict}${gained ? ` <span class="xp-gain">+${gained} XP</span>` : ""}</div>` +
+    (!ok && given ? `<p>You wrote: ${mode === "n2f" ? fsub(normFormula(given)) : esc(given)}</p>` : "") +
+    `<p class="ans">Answer: <b>${answerHTML(q, mode)}</b></p>` +
+    (note ? `<p class="note">${esc(note)}</p>` : "") +
+    `<p>${mode === "n2f" ? q.n2fExplain : q.f2nExplain}</p>`;
+  fb.hidden = false;
+  $("answer").readOnly = true;
+  $("go").textContent = S.len && S.quiz.length >= S.len ? "See results" : "Next →";
+  $("hintBtn").disabled = $("revealBtn").disabled = $("skipBtn").disabled = true;
+  $("go").focus({ preventScroll: true });
+  renderBoard();
+}
+
+function renderRank() {
+  const r = rankOf(S.xp);
+  $("r-level").textContent = r.index + 1;
+  $("r-name").textContent = r.name;
+  $("r-sub").textContent = `Rank ${r.index + 1} of ${RANKS.length}`;
+  $("r-fill").style.width = r.pct + "%";
+  $("r-bar").setAttribute("aria-valuenow", r.pct);
+  $("r-xp").textContent = `${S.xp.toLocaleString()} XP`;
+  $("r-next").textContent = r.next ? `${r.toNext.toLocaleString()} XP to ${r.next}` : "Top rank reached";
+}
+
+function renderBoard() {
+  renderRank();
+  $("s-score").textContent = `${S.correct}/${S.total}`;
+  $("s-streak").textContent = S.streak;
+  $("s-best").textContent = S.best;
+  $("bars").innerHTML = TOPICS.filter(t => S.topics.has(t.id) || S.per[t.id].n).map(t => {
+    const p = S.per[t.id], pct = p.n ? Math.round(100 * p.ok / p.n) : 0;
+    return `<div class="bar-row" style="--c: var(${t.color})"><span>${t.short}</span><span class="n">${p.n ? `${p.ok}/${p.n}` : "–"}</span><span class="bar"><i style="width:${pct}%"></i></span></div>`;
+  }).join("");
+  $("history").innerHTML = S.history.length ? S.history.map(h =>
+    `<li><span class="m ${h.ok ? "ok" : "no"}" aria-label="${h.ok ? "correct" : "incorrect"}">${h.ok ? "✓" : "✗"}</span><span class="q">${h.prompt} <span>→ ${h.answer}</span></span></li>`).join("")
+    : `<li class="empty">Your last few answers will show here.</li>`;
+}
+
+function showSummary() {
+  const n = S.quiz.length, ok = S.quiz.filter(r => r.ok).length;
+  const pct = Math.round(100 * ok / n);
+  const when = new Date().toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+  const topics = [...S.topics].map(id => topicById[id].short).join(", ");
+  $("summary").innerHTML =
+    `<div class="qhead"><span class="qkind">Quiz results</span></div>
+     <div><div class="score">${ok}/${n}</div><div class="meta">${pct}% correct · ${esc(when)} · ${esc(topics)}</div></div>
+     <div class="table-wrap"><table><thead><tr><th></th><th>Question</th><th>Correct answer</th><th>You wrote</th></tr></thead><tbody>` +
+    S.quiz.map(r => `<tr><td class="${r.ok ? "ok" : "no"}">${r.ok ? "✓" : "✗"}</td><td>${r.prompt}</td><td>${r.answer}</td><td>${r.given ? (r.mode === "n2f" ? fsub(normFormula(r.given)) : esc(r.given)) : "<i>shown / skipped</i>"}</td></tr>`).join("") +
+    `</tbody></table></div>
+     <div class="tools"><button class="primary" id="againBtn" type="button">Start a new quiz</button></div>`;
+  $("qcard").hidden = true; $("summary").hidden = false;
+  $("againBtn").onclick = restart;
+  $("againBtn").focus({ preventScroll: true });
+}
+
+function buildReference() {
+  const polyRows = POLY.map(a => `<tr><td>${ion(a.f, a.q)}</td><td>${esc(a.name)}${a.alt ? ` <span style="color:var(--muted)">(${esc(a.alt.join(", "))})</span>` : ""}</td></tr>`).join("");
+  const polySection = S.topics.has("poly") || S.topics.has("acid")
+    ? `<div><h3>Polyatomic ions</h3><div class="table-wrap"><table><tbody>${polyRows}</tbody></table></div></div>` : "";
+  const acidSection = S.topics.has("acid")
+    ? `<h3 style="margin-top:16px">Naming acids</h3>
+       <p>-ide anion → hydro-<i>root</i>-ic acid (Cl<sup>${MINUS}</sup> → hydrochloric acid)</p>
+       <p>-ate anion → <i>root</i>-ic acid (NO<sub>3</sub><sup>${MINUS}</sup> → nitric acid)</p>
+       <p>-ite anion → <i>root</i>-ous acid (NO<sub>2</sub><sup>${MINUS}</sup> → nitrous acid)</p>` : "";
+  const varRows = VARIABLE.map(m => `<tr><td>${esc(cap(m.name))}</td><td>${m.qs.map(q => ion(m.f, q) + " " + esc(m.name) + "(" + ROMAN[q] + ")").join("<br>")}</td></tr>`).join("");
+  const fixedRows = [1, 2, 3].map(q => `<tr><td>${chargeSup(q).replace(/<\/?sup>/g, "")}</td><td>${FIXED.filter(m => m.q === q).map(m => esc(m.f)).join(", ")}</td></tr>`).join("");
+  const monoRows = MONO.map(a => `<tr><td>${ion(a.f, a.q)}</td><td>${esc(a.name)}</td></tr>`).join("");
+  $("refBody").innerHTML =
+    polySection + `<div><h3>Metals with more than one charge</h3><div class="table-wrap"><table><tbody>${varRows}</tbody></table></div>
+       <h3 style="margin-top:16px">Metals with one charge</h3><div class="table-wrap"><table><tbody>${fixedRows}</tbody></table></div></div>
+     <div><h3>Single-element anions</h3><div class="table-wrap"><table><tbody>${monoRows}</tbody></table></div>
+       <h3 style="margin-top:16px">Prefixes for molecular compounds</h3>
+       <p>${PREFIX.slice(1).map((p, i) => `${i + 1} ${p}`).join(" · ")}</p>
+       <p>Leave mono- off the first element. Drop the a or o of a prefix before "oxide": pentoxide, monoxide.</p>${acidSection}</div>`;
+}
+
+// Events
+// Check and Next are plain click and Enter-key handlers, not a form submit, so they keep
+// working where form submission is blocked (sandboxed file previews, some LMS embeds).
+function submitAnswer() {
+  if (S.answered) { next(); return; }
+  const v = $("answer").value;
+  if (!v.trim()) { $("answer").focus(); return; }
+  const r = checkAnswer(S.q, S.mode, v);
+  grade(r.ok, v.trim(), r.note, false);
+}
+$("go").addEventListener("click", submitAnswer);
+$("answer").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); submitAnswer(); }
+});
+$("answer").addEventListener("input", () => {
+  if (S.mode !== "n2f") { $("preview").innerHTML = ""; return; }
+  const v = normFormula($("answer").value);
+  $("preview").innerHTML = v ? "Reads as: <b>" + fsub(v) + "</b>" : "";
+});
+$("hintBtn").onclick = () => {
+  S.hintUsed = true;
+  $("hint").innerHTML = S.mode === "n2f" ? S.q.n2fHint : S.q.f2nHint;
+  $("hint").hidden = false;
+  $("answer").focus({ preventScroll: true });
+};
+$("revealBtn").onclick = () => { if (!S.answered) grade(false, null, null, true); };
+$("skipBtn").onclick = () => { if (!S.answered) grade(false, null, null, true); };
+let rankResetTimer = null;
+$("rankResetBtn").onclick = () => {
+  const b = $("rankResetBtn");
+  if (!rankResetTimer) {
+    b.textContent = "Click again to reset your rank to Lab Novice";
+    rankResetTimer = setTimeout(() => { rankResetTimer = null; b.textContent = "Reset rank"; }, 4000);
+    return;
+  }
+  clearTimeout(rankResetTimer); rankResetTimer = null; b.textContent = "Reset rank";
+  S.xp = 0; store.set("xp", 0); renderRank();
+};
+$("resetBtn").onclick = () => {
+  S.total = S.correct = S.streak = 0; S.history = [];
+  TOPICS.forEach(t => S.per[t.id] = { n: 0, ok: 0 });
+  restart(); renderBoard();
+};
+
+buildSettings();
+buildReference();
+renderBoard();
+next();
+</script>
+</body>
+</html>
